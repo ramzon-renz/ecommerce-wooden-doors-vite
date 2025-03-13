@@ -9,7 +9,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart as CartIcon, Trash2, X, Edit, Check } from "lucide-react";
+import {
+  ShoppingCart as CartIcon,
+  Trash2,
+  X,
+  Edit,
+  Check,
+  FileText,
+} from "lucide-react";
 import { ProductCustomization } from "./CustomizationPanel";
 
 interface ShoppingCartProps {
@@ -38,8 +45,10 @@ export default function ShoppingCart({
   }, [items]);
 
   const handleRequestQuote = () => {
-    onRequestQuote(items);
-    setIsOpen(false);
+    if (items.length > 0) {
+      onRequestQuote(items);
+      setIsOpen(false);
+    }
   };
 
   const handleEditItem = (item: ProductCustomization, index: number) => {
@@ -89,10 +98,11 @@ export default function ShoppingCart({
           variant="ghost"
           size="icon"
           className="relative hover:bg-transparent"
+          aria-label="Shopping cart"
         >
           <CartIcon
             size={22}
-            className="text-gray-700 hover:text-primary transition-colors duration-200"
+            className="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200"
           />
           {itemCount > 0 && (
             <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -139,18 +149,20 @@ export default function ShoppingCart({
                 {items.map((item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 rounded-lg p-3 md:p-4 shadow-sm transition-all duration-200 hover:shadow-md"
+                    className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 md:p-4 shadow-sm transition-all duration-200 hover:shadow-md"
                     onMouseEnter={() => setHoveredItem(index)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
                     <div className="flex justify-between items-start">
-                      <h3 className="font-medium">{item.productName}</h3>
+                      <h3 className="font-medium dark:text-white">
+                        {item.productName}
+                      </h3>
                       <div className="flex space-x-1">
                         {onEditItem && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 text-gray-500 hover:text-primary hover:bg-gray-100"
+                            className="h-6 w-6 text-gray-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700"
                             onClick={() => handleEditItem(item, index)}
                             title="Edit item"
                           >
@@ -160,7 +172,7 @@ export default function ShoppingCart({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 text-gray-500 hover:text-red-500 hover:bg-gray-100"
+                          className="h-6 w-6 text-gray-500 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                           onClick={() => onRemoveItem(index)}
                           title="Remove item"
                         >
@@ -169,7 +181,7 @@ export default function ShoppingCart({
                       </div>
                     </div>
 
-                    <div className="mt-2 text-sm text-gray-600 space-y-1">
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 space-y-1">
                       <p>Material: {getMaterialName(item.materialType)}</p>
                       <p>Finish: {getFinishName(item.colorFinish)}</p>
                       <p>Glass: {getGlassName(item.glassPanel)}</p>
@@ -182,19 +194,20 @@ export default function ShoppingCart({
                     </div>
 
                     <div className="mt-3 flex justify-between items-center">
-                      <span className="font-bold">
+                      <span className="font-bold dark:text-white">
                         ${item.totalPrice.toFixed(2)}
                       </span>
-                      {hoveredItem === index && onEditItem && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs gap-1 border-primary/30 hover:border-primary"
-                          onClick={() => handleEditItem(item, index)}
-                        >
-                          <Edit size={12} /> Edit Options
-                        </Button>
-                      )}
+                      {(hoveredItem === index || window.innerWidth < 640) &&
+                        onEditItem && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs gap-1 border-primary/30 hover:border-primary dark:border-primary/50 dark:hover:border-primary"
+                            onClick={() => handleEditItem(item, index)}
+                          >
+                            <Edit size={12} /> Edit Options
+                          </Button>
+                        )}
                     </div>
                   </div>
                 ))}
@@ -202,27 +215,33 @@ export default function ShoppingCart({
             </ScrollArea>
 
             <div className="mt-auto pt-4">
-              <Separator className="mb-4" />
+              <Separator className="mb-4 dark:bg-gray-700" />
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span className="font-medium">${totalPrice.toFixed(2)}</span>
+                  <span className="dark:text-white">Subtotal</span>
+                  <span className="font-medium dark:text-white">
+                    ${totalPrice.toFixed(2)}
+                  </span>
                 </div>
 
-                <div className="flex justify-between text-sm text-gray-500">
+                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                   <span>Shipping & taxes</span>
                   <span>Calculated at checkout</span>
                 </div>
               </div>
 
               <div className="mt-6 space-y-2">
-                <Button className="w-full" onClick={handleRequestQuote}>
+                <Button
+                  className="w-full gap-2 bg-primary hover:bg-primary/90 text-white"
+                  onClick={handleRequestQuote}
+                >
+                  <FileText size={16} />
                   Request Quote
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full dark:text-white dark:border-gray-600"
                   onClick={() => setIsOpen(false)}
                 >
                   Continue Shopping
